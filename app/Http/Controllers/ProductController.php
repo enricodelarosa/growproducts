@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use Illuminate\View\View;
 
 use App\Models\Product;
@@ -50,7 +51,20 @@ class ProductController extends Controller
 
         $products = $products_class->get();
 
-        return response()->json($products);
+        $xmlData = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xmlData .= '<products>';
+    
+        foreach ($products as $product) {
+            $xmlData .= '<product>';
+            $xmlData .= '<name>' . $product->name . '</name>';
+            $xmlData .= '<price>' . $product->price . '</price>';
+            $xmlData .= '<category>' . $product->category->name . '</category>';
+            $xmlData .= '</product>';
+        }
+    
+        $xmlData .= '</products>';
+    
+        return Response::make($xmlData, '200')->header('Content-Type', 'text/xml');
     }
 }
 
